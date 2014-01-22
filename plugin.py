@@ -138,8 +138,8 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		"""[<channel>] <regexp> <action> 
 		
 		regexp should match userhostmask#user?name account :text,
-		if bot doesn't support CAPS, it's userhostmask text
-		for action you can use $id, $channel, $nick $hostmask $account $username $1, etc
+		if bot doesn't support CAPS, it's userhostmask :text
+		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
 		if not ircdb.checkCapability(msg.prefix, 'owner'):
 			return
@@ -151,9 +151,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 	def onnick (self,irc,msg,args,channel,regexp,action):
 		"""[<channel>] <regexp> <action> 
 		
-		regexp should match userhostmask#user?name account text,
-		if bot doesn't support CAPS, it's userhostmask text
-		for action you can use $id, $channel, $nick $hostmask $account $username $1, etc
+		regexp should match userhostmask#user?name account :oldNick newNick,
+		if bot doesn't support CAPS, it's userhostmask :oldNick newNick
+		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
 		if not ircdb.checkCapability(msg.prefix, 'owner'):
 			return
@@ -165,9 +165,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 	def onjoin (self,irc,msg,args,channel,regexp,action):
 		"""[<channel>] <regexp> <action> 
 		
-		regexp should match userhostmask#user?name account text,
-		if bot doesn't support CAPS, it's userhostmask text
-		for action you can use $id, $channel, $nick $hostmask $account $username $1, etc
+		regexp should match userhostmask#user?name account,
+		if bot doesn't support CAPS, it's userhostmask
+		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
 		if not ircdb.checkCapability(msg.prefix, 'owner'):
 			return
@@ -179,9 +179,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 	def onquit (self,irc,msg,args,channel,regexp,action):
 		"""[<channel>] <regexp> <action> 
 		
-		regexp should match userhostmask :reason ( if there is reason ),
-		if bot doesn't support CAPS, it's userhostmask text
-		for action you can use $id, $channel, $nick $hostmask $account $username $1, etc
+		regexp should match userhostmask#user?name account :reason (if there is one)
+		if bot doesn't support CAPS, it's userhostmask :reason
+		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
 		if not ircdb.checkCapability(msg.prefix, 'owner'):
 			return
@@ -207,7 +207,7 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		irc.reply(', '.join(L), private=True)
 	list = wrap(list,['op'])
 	
-	def query (self,irc,msg,args,channel,text):
+	def regquery (self,irc,msg,args,channel,text):
 		"""[<channel>] <text>
 		
 		return matched items
@@ -227,9 +227,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 				(uid,kind,regexp,action,enable) = item
 				L.append('[#%s %s %s %s %s]' % (uid,kind,regexp,action,enable))
 		irc.reply(', '.join(L))
-	query = wrap(query,['op','text'])
+	regquery = wrap(regquery,['op','text'])
 	
-	def toggle (self,irc,msg,args,channel,uids,flag):
+	def regtoggle (self,irc,msg,args,channel,uids,flag):
 		"""[<channel>] <id>,[<id>] <boolean>
 		
 		enable or disable a regexp
@@ -262,9 +262,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		else:
 			irc.reply('item not found')
 		c.close()
-	toggle = wrap(toggle,['op',commalist('int'),'boolean'])
+	regtoggle = wrap(regtoggle,['op',commalist('int'),'boolean'])
 	
-	def remove (self,irc,msg,args,channel,uids):
+	def regremove (self,irc,msg,args,channel,uids):
 		"""[<channel>] <id>,[<id>]
 		
 		remove regexps
@@ -293,9 +293,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		else:
 			irc.reply('item not found')
 		c.close()
-	remove = wrap(remove,['op',commalist('int')])
+	regremove = wrap(regremove,['op',commalist('int')])
 	
-	def info (self,irc,msg,args,channel,uid):
+	def reginfo (self,irc,msg,args,channel,uid):
 		"""[<channel>] <id>
 		
 		return info about the regexp
@@ -312,7 +312,7 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 			irc.reply('[#%s %s %s %s %s %s %s %s]' % (uid,channel,oper,time.strftime('%Y-%m-%d %H:%M:%S GMT',time.gmtime(float(at))),kind,regexp,action,enable))
 		else:
 			irc.reply('item not found')
-	info = wrap(info,['op','int'])
+	reginfo = wrap(reginfo,['op','int'])
 	
 	def makeDb(self, filename):
 		"""Create a database and connect to it."""
