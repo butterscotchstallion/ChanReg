@@ -372,11 +372,10 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 					o.pattern = pattern
 					o.action = action
 					o.kind = kind
-					o.enable = 1
+					o.enable = enable
 					o.owner = prefix
 					if not kind in i[channel].kinds:
 						i[channel].kinds[kind] = {}
-					self.log.debug('added %s %s %s %s' % (uid,kind,pattern,action))
 					i[channel].kinds[kind][pattern] = o
 		return i[channel]
 	
