@@ -439,9 +439,10 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 					s = msg.prefix
 					if not msg.nick in chan.nicks:
 						chan.nicks[msg.nick] = [msg.prefix,'','']
-					s += '#' + chan.nicks[msg.nick][1]
 					if chan.nicks[msg.nick][2] != '':
-						s += ' ' + chan.nicks[msg.nick][2]
+						s += '#' + chan.nicks[msg.nick][2]
+					if chan.nicks[msg.nick][1] != '':
+						s += ' ' + chan.nicks[msg.nick][1]
 					s += ' :' + text
 					self.checkAndAct(irc,msg.prefix,chan,'text',chan.kinds['text'],s,msg)
 	
