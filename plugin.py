@@ -141,8 +141,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		if bot doesn't support CAPS, it's userhostmask :text
 		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		chan = self.getChan(irc,channel)
 		irc.reply('#%s added' % chan.add(msg.prefix,regexp[0],regexp[1],action,'text',db))
@@ -155,8 +153,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		if bot doesn't support CAPS, it's userhostmask :oldNick newNick
 		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		chan = self.getChan(irc,channel)
 		irc.reply('#%s added' % chan.add(msg.prefix,regexp[0],regexp[1],action,'nick',db))
@@ -169,8 +165,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		if bot doesn't support CAPS, it's userhostmask
 		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		chan = self.getChan(irc,channel)
 		irc.reply('#%s added' % chan.add(msg.prefix,regexp[0],regexp[1],action,'join',db))
@@ -183,8 +177,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		if bot doesn't support CAPS, it's userhostmask :reason
 		for action you can use $id, $channel, $nick, $hostmask, $account, $username, $*, $1, etc
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		chan = self.getChan(irc,channel)
 		irc.reply('#%s added' % chan.add(msg.prefix,regexp[0],regexp[1],action,'quit',db))
@@ -195,8 +187,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		
 		return list of regular expression for that channel
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		chan = self.getChan(irc,channel)
 		L = []
 		for k in chan.kinds:
@@ -212,8 +202,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		
 		return matched items
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		c = db.cursor()
 		glob = '*%s*' % text
@@ -234,8 +222,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		
 		enable or disable a regexp
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		c = db.cursor()
 		n = 0
@@ -269,8 +255,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		
 		remove regexps
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		c = db.cursor()
 		n = 0
