@@ -91,7 +91,7 @@ class Chan (object):
 	
 	def add (self,prefix,pattern,regexp,action,kind,db):
 		c = db.cursor()
-		c.execute("""INSERT INTO regexps VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)""", (self.name,prefix,float(time.time()),kind,pattern,action,1))
+		c.execute("""INSERT INTO regexps VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)""", (self.name,prefix,float(time.time()),kind,pattern,action,'1'))
 		db.commit()
 		c.close()
 		if not kind in self.kinds:
@@ -226,9 +226,9 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		c = db.cursor()
 		n = 0
 		if flag:
-			flag = 1
+			flag = '1'
 		else:
-			flag = 0
+			flag = '0'
 		for uid in uids:
 			c.execute ("""SELECT channel,kind,enable FROM regexps WHERE id=?""",(uid,))
 			items = c.fetchall()
@@ -394,7 +394,7 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 	def checkAndAct (self,irc,prefix,chan,kind,items,text,msg):
 		for pattern in list(items.keys()):
 			item = chan.kinds[kind][pattern]
-			if item.enable == 1:
+			if item.enable == '1':
 				for match in re.finditer(item.re, text):
 					if match:
 						act = item.action
