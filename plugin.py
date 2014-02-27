@@ -103,7 +103,7 @@ class Chan (object):
 		i.pattern = pattern
 		i.action = action
 		i.kind = kind
-		i.enable = 1
+		i.enable = '1'
 		i.owner = prefix
 		self.kinds[kind][i.pattern] = i
 		return i.uid
