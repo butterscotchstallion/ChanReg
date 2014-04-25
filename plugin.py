@@ -409,13 +409,22 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 						act = act.replace('$id',str(item.uid))
 						act = act.replace('$channel',chan.name)
 						act = act.replace('$*',text)
+						if act.find(' :') != -1:
+							a = text.split(' :')
+							if len(a) > 1:
+							    act = act.replace('$text',text.split(' :')[1])
 						for (i, j) in enumerate(match.groups()):
 							act = re.sub(r'\$' + str(i+1), match.group(i+1), act)
 						self.act(irc,msg,chan.name,act,item.owner)
 						break
 	
 	def checkMessage (self,irc,msg):
-		(channels, text) = msg.args
+		channels = None
+		text = None
+		try:
+			(channels, text) = msg.args
+		except:
+			return
 		for channel in channels.split(','):
 			if irc.isChannel(channel) and channel in irc.state.channels:
 				chan = self.getChan(irc,channel)
