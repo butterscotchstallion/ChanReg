@@ -422,8 +422,11 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		channels = None
 		text = None
 		try:
-			(channels, text) = msg.args
+			if len(msg.args) > 1:
+				(channels, text) = msg.args
 		except:
+			return
+		if not channels or not text:
 			return
 		for channel in channels.split(','):
 			if irc.isChannel(channel) and channel in irc.state.channels:
