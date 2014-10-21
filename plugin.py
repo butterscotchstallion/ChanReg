@@ -188,13 +188,12 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		return list of regular expression for that channel
 		"""
 		chan = self.getChan(irc,channel)
-		L = []
 		for k in chan.kinds:
-			L.append('for %s' % k)
-			for i in list(chan.kinds[k].keys()):
+			L = list(chan.kinds[k].keys())
+			L.sort()
+			for i in L:
 				p = chan.kinds[k][i]
-				L.append('[#%s %s %s %s %s]' % (p.uid,p.kind,p.pattern,p.action,p.enable))
-		irc.reply(', '.join(L), private=True)
+				irc.queueMsg(ircmsgs.privmsg(msg.nick,'[#%s %s %s %s %s]' % (p.uid,p.kind,p.pattern,p.action,p.enable)))
 	list = wrap(list,['op'])
 	
 	def regquery (self,irc,msg,args,channel,text):
@@ -209,12 +208,14 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		c.execute ("""SELECT id, kind, regexp, action, enable FROM regexps WHERE channel=? AND (regexp GLOB ? OR regexp LIKE ? OR action GLOB ? or action GLOB ?) ORDER BY id DESC""",(channel,glob,like,glob,like))
 		items = c.fetchall()
 		c.close()
-		L = []
 		if len(items):
+			L = []
 			for item in items:
 				(uid,kind,regexp,action,enable) = item
 				L.append('[#%s %s %s %s %s]' % (uid,kind,regexp,action,enable))
-		irc.reply(', '.join(L))
+			irc.reply(', '.join(L), private=True)
+		else:
+			irc.reply('nothing found')
 	regquery = wrap(regquery,['op','text'])
 	
 	def regtoggle (self,irc,msg,args,channel,uids,flag):
@@ -284,8 +285,6 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		
 		return info about the regexp
 		"""
-		if not ircdb.checkCapability(msg.prefix, 'owner'):
-			return
 		db = self.getDb(channel)
 		c = db.cursor()
 		c.execute ("""SELECT channel,oper,at,kind,regexp,action,enable FROM regexps WHERE id=?""",(uid,))
@@ -342,7 +341,7 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 			i[channel] = Chan(channel)
 			db = self.getDb(channel)
 			c = db.cursor()
-			c.execute("""SELECT id,channel,regexp,action,kind,enable,oper from regexps where channel=?""",(channel,))
+			c.execute("""SELECT id,channel,regexp,action,kind,enable,oper from regexps where channel=? order by id DESC""",(channel,))
 			items = c.fetchall()
 			c.close()
 			if len(items):
@@ -388,10 +387,14 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
 		#elif ircdb.checkCapability(irc.prefix, 'owner') or ircdb.checkCapability(irc.prefix, '%s,op' % channel):
 		#	owner = irc.prefix
 		msg.command = 'PRIVMSG'
-		msg.prefix = owner
+		(n,i,h) = ircutils.splitHostmask(owner)
+		msg.prefix = ircutils.joinHostmask(irc.nick,i,h)
 		self.Proxy(irc.irc, msg, tokens)
 	
 	def checkAndAct (self,irc,prefix,chan,kind,items,text,msg):
+		protected = ircdb.makeChannelCapability(chan.name, 'protected')
+		if ircdb.checkCapability(prefix, protected):
+			return
 		for pattern in list(items.keys()):
 			item = chan.kinds[kind][pattern]
 			if item.enable == '1':
