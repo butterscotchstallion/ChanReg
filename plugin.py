@@ -389,7 +389,8 @@ class ChanReg(callbacks.Plugin,plugins.ChannelDBHandler):
         def d():
             self.Proxy(irc.irc, msg, tokens)
         
-        schedule.addEvent(d,time.time()+5)
+        # Wait 30 seconds before sending PM
+        schedule.addEvent(d,time.time()+30)
         
     def checkAndAct (self,irc,prefix,chan,kind,items,text,msg):
         protected = ircdb.makeChannelCapability(chan.name, 'protected')
